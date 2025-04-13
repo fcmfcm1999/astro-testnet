@@ -1,2 +1,4 @@
 .idea
 astros.iml
+node_modules
+src/data
