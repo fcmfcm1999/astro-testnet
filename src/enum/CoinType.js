@@ -1,0 +1,3 @@
+export const CoinType = {
+    USDC_TEST: "0xa3c8f6988cf4694e5b032f82934a6ec5e848a6cb3af302a12b23521a49d27f95::USDC_TEST::USDC_TEST",
+};

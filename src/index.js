@@ -8,6 +8,9 @@ import { fileURLToPath } from "node:url";
 import { isValidToken } from "./utils/util.js";
 import { login } from "./services/UserService.js";
 import { writeFileSync } from "node:fs";
+import { queryCoinBalance } from "./utils/TransactionUtil.js";
+import { CoinType } from "./enum/CoinType.js";
+import { claimFaucet } from "./services/FaucetService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +45,10 @@ async function main() {
         writeFileSync(configPath, JSON.stringify(config, null, 2));
     }
 
+    const testCoinBalance = await queryCoinBalance(client, keypair, CoinType.USDC_TEST)
+    if (testCoinBalance === 0n) {
+        await claimFaucet(client, keypair)
+    }
 }
 
 main()
