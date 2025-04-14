@@ -22,6 +22,7 @@ export async function claimFaucet(client, keypair) {
         const result = await client.signAndExecuteTransactionBlock({
             transactionBlock: tx,
             signer: keypair,
+            requestType: "WaitForLocalExecution",
             options: {
                 showInput: true,
                 showEffects: true,
@@ -29,7 +30,6 @@ export async function claimFaucet(client, keypair) {
             },
         });
 
-        await waitForTransactionConfirmation(client, result.digest)
 
         if (result.effects?.status.status !== 'success') {
             throw new Error(`${result.effects?.status.error}`);
