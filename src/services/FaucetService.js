@@ -1,6 +1,5 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { CoinType } from "../enum/CoinType.js";
-import { waitForTransactionConfirmation } from "../utils/TransactionUtil.js";
 
 export async function claimFaucet(client, keypair) {
     try {

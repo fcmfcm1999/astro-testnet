@@ -1,5 +1,4 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { getCoinObjects, waitForTransactionConfirmation } from "../utils/TransactionUtil.js";
 import { CoinType } from "../enum/CoinType.js";
 
 export async function deposit(client, keypair) {

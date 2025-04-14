@@ -1,51 +1,12 @@
 import axios from 'axios';
 
-let headers = {
-    'accept': 'application/json, text/plain, */*',
-    'accept-language': 'en-US',
-    'authorization': '',
-    'brand-exchange': 'sui',
-    'content-type': 'application/json',
-    'invite-code': 'AYXOT2',
-    'origin': 'https://beta.astros.ag',
-    'platform-exchange': 'navi',
-    'priority': 'u=1, i',
-    'referer': 'https://beta.astros.ag/',
-    'sec-ch-ua': '"Microsoft Edge";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"macOS"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'cross-site',
-    'source-client': 'Web',
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0'
-}
-
-// 交易列表请求的headers
-let transactionHeaders = {
-  'accept': 'application/json, text/plain, */*',
-  'accept-language': 'en-US,en;q=0.9,zh;q=0.8,zh-HK;q=0.7,zh-CN;q=0.6,zh-TW;q=0.5',
-  'dnt': '1',
-  'origin': 'https://beta.astros.ag',
-  'priority': 'u=1, i',
-  'referer': 'https://beta.astros.ag/',
-  'sec-ch-ua': '"Chromium";v="135", "Not-A.Brand";v="8"',
-  'sec-ch-ua-mobile': '?0',
-  'sec-ch-ua-platform': '"macOS"',
-  'sec-fetch-dest': 'empty',
-  'sec-fetch-mode': 'cors',
-  'sec-fetch-site': 'cross-site',
-  'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
-}
-
-// 生成nonce请求的headers
-let nonceHeaders = {
+// 公共headers
+const commonHeaders = {
   'accept': 'application/json, text/plain, */*',
   'accept-language': 'en-US',
   'authorization': '',
   'brand-exchange': 'sui',
   'content-type': 'application/json',
-  'dnt': '1',
   'origin': 'https://beta.astros.ag',
   'platform-exchange': 'navi',
   'priority': 'u=1, i',
@@ -61,6 +22,11 @@ let nonceHeaders = {
 }
 
 export const requestLoginApi = async (data) => {
+    // 登录特有的headers
+    const headers = {
+        ...commonHeaders,
+        'invite-code': 'AYXOT2',
+    };
 
     const response = await axios.post('https://dasprkkzjjkl7.cloudfront.net/api/auth/auth/token',
         data,
@@ -84,9 +50,16 @@ export const requestLoginApi = async (data) => {
  */
 export const getTransactionList = async (address, page = 1, limit = 10) => {
     try {
+        // 交易列表特有的headers
+        const headers = {
+            ...commonHeaders,
+            'accept-language': 'en-US,en;q=0.9,zh;q=0.8,zh-HK;q=0.7,zh-CN;q=0.6,zh-TW;q=0.5',
+            'dnt': '1'
+        };
+
         const response = await axios.get(
             `https://aggregator-api.naviprotocol.io/bridge-swap/transactions/list?address=${address}&page=${page}&limit=${limit}`,
-            { headers: transactionHeaders }
+            { headers }
         );
 
         console.log(response.data);
@@ -107,10 +80,16 @@ export const getTransactionList = async (address, page = 1, limit = 10) => {
  */
 export const generateNonce = async (address) => {
     try {
+        // nonce特有的headers
+        const headers = {
+            ...commonHeaders,
+            'dnt': '1'
+        };
+
         const response = await axios.post(
             'https://dasprkkzjjkl7.cloudfront.net/api/auth/auth/generateNonce',
             { address },
-            { headers: nonceHeaders }
+            { headers }
         );
 
         if (response.status === 200) {
@@ -119,6 +98,107 @@ export const generateNonce = async (address) => {
         return null;
     } catch (error) {
         console.error('生成nonce失败:', error);
+        return null;
+    }
+};
+
+export const openPosition = async (body, token) => {
+    try {
+        // 开仓特有的headers
+        const headers = {
+            ...commonHeaders,
+            'dnt': '1',
+            'origin': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app',
+            'referer': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app/'
+        };
+        
+        // 设置认证令牌
+        if (token) {
+            headers.authorization = `Bearer ${token}`;
+        }
+
+        const response = await axios.post(
+            'https://dasprkkzjjkl7.cloudfront.net/api/contract-provider/contract/order/openPosition',
+            body,
+            { headers }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+        return null;
+    } catch (error) {
+        console.error('开仓失败:', error);
+        return null;
+    }
+};
+
+export const closePosition = async (body, token) => {
+    try {
+        // 平仓特有的headers
+        const headers = {
+            ...commonHeaders,
+            'dnt': '1',
+            'origin': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app',
+            'referer': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app/'
+        };
+        
+        // 设置认证令牌
+        if (token) {
+            headers.authorization = `Bearer ${token}`;
+        }
+
+        const response = await axios.post(
+            'https://dasprkkzjjkl7.cloudfront.net/api/contract-provider/contract/order/closePosition',
+            body,
+            { headers }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+        return null;
+    } catch (error) {
+        console.error('平仓失败:', error);
+        return null;
+    }
+};
+
+/**
+ * 查询Position列表
+ * @param {Object} body - 查询参数
+ * @param {number} body.pageNo - 页码
+ * @param {number} body.pageSize - 每页数量
+ * @param {string} token - 认证令牌
+ * @returns {Promise<Object>} - 返回Position列表数据
+ */
+export const getPositionList = async (body, token) => {
+    try {
+        // 查询Position特有的headers
+        const headers = {
+            ...commonHeaders,
+            'dnt': '1',
+            'origin': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app',
+            'referer': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app/'
+        };
+        
+        // 设置认证令牌
+        if (token) {
+            headers.authorization = `Bearer ${token}`;
+        }
+
+        const response = await axios.post(
+            'https://dasprkkzjjkl7.cloudfront.net/api/contract-provider/contract/selectContractPositionList',
+            body,
+            { headers }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+        return null;
+    } catch (error) {
+        console.error('查询Position列表失败:', error);
         return null;
     }
 };

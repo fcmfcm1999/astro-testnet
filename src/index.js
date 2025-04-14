@@ -8,10 +8,10 @@ import { fileURLToPath } from "node:url";
 import { isValidToken } from "./utils/util.js";
 import { login } from "./services/UserService.js";
 import { writeFileSync } from "node:fs";
-import { queryCoinBalance, waitForTransactionConfirmation } from "./utils/TransactionUtil.js";
 import { CoinType } from "./enum/CoinType.js";
 import { claimFaucet } from "./services/FaucetService.js";
 import { deposit } from "./services/DepositService.js";
+import { queryPositions, openLongBTCWithMarket, closeLongBTCWithMarket } from "./services/PositionService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,15 +42,18 @@ async function main() {
         }
         // update bearer token in this context
         // update json file
-        account.bearer = bearerToken
+        account.bearerToken = bearerToken
         writeFileSync(configPath, JSON.stringify(config, null, 2));
     }
 
-    const testCoinBalance = await queryCoinBalance(client, keypair, CoinType.USDC_TEST)
-    if (testCoinBalance === 0n) {
-        await claimFaucet(client, keypair)
-    }
-    await deposit(client, keypair)
+    // const testCoinBalance = await queryCoinBalance(client, keypair, CoinType.USDC_TEST)
+    // if (testCoinBalance === 0n) {
+    //     await claimFaucet(client, keypair)
+    // }
+    // await deposit(client, keypair)
+    // await openLongBTCWithMarket(keypair, 0.001, account.bearerToken)
+    // console.log(await queryPositions(keypair, account.bearerToken))
+    await closeLongBTCWithMarket(keypair, account.bearerToken)
 }
 
 main()
