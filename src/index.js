@@ -11,7 +11,10 @@ import { writeFileSync } from "node:fs";
 import { CoinType } from "./enum/CoinType.js";
 import { claimFaucet } from "./services/FaucetService.js";
 import { deposit } from "./services/DepositService.js";
-import { queryPositions, openLongBTCWithMarket, closeLongBTCWithMarket } from "./services/PositionService.js";
+import {
+    queryPositions,
+    openEthWithMarket, printPositionsInfo
+} from "./services/PositionService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,10 +34,7 @@ async function main() {
     console.log(chalk.gray('----------------------------------------'));
     console.log(chalk.magenta('👤 正在处理地址:'), chalk.white(keypair.toSuiAddress()));
 
-    if (isValidToken(account.bearerToken)) {
-        console.log(`token is valid`)
-    } else {
-        console.log('token is invalid')
+    if (!isValidToken(account.bearerToken)) {
         const bearerToken = await login(keypair)
         if (bearerToken == null) {
             console.error(`Failed to login to get bearer token for address: ${keypair.toSuiAddress()}`)
@@ -53,7 +53,9 @@ async function main() {
     // await deposit(client, keypair)
     // await openLongBTCWithMarket(keypair, 0.001, account.bearerToken)
     // console.log(await queryPositions(keypair, account.bearerToken))
-    await closeLongBTCWithMarket(keypair, account.bearerToken)
+    // await openEthWithMarket(keypair, 0.1, account.bearerToken)
+    // console.log(await queryPositions(keypair, account.bearerToken))
+    await printPositionsInfo(keypair, account.bearerToken)
 }
 
 main()
