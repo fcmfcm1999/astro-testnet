@@ -83,7 +83,7 @@ export async function closePositionWithMarket(positionInfo, keypair, token, prox
             perpInfo = PrepType.BTC_USD
             break
         default:
-            perpInfo = null
+            perpInfo = PrepType.SUI_USD
     }
     const quantity = positionInfo.quantity
     try {

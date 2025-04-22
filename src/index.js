@@ -122,7 +122,7 @@ async function main() {
         const {direction} = await inquirer.prompt([
             {
                 type: 'list',
-                name: 'isLong',
+                name: 'direction',
                 message: '选择开仓方向',
                 choices: ['做多', '做空']
             }
