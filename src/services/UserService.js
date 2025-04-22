@@ -1,10 +1,11 @@
-import { generateNonce, getTransactionList, requestLoginApi } from "../api/api.js";
+import { generateNonce, getDepositedUsdcBalance, getTransactionList, requestLoginApi } from "../api/api.js";
 import { isValidToken } from "../utils/util.js";
 import { writeFileSync } from "node:fs";
 import { decodeSuiPrivateKey } from "@mysten/sui.js/cryptography";
 import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
 import { queryPositions } from "./PositionService.js";
 import Table from "cli-table3";
+import chalk from "chalk";
 
 export async function login(keypair, proxy) {
     const nonce = await generateNonce(keypair.toSuiAddress(), proxy)
@@ -19,6 +20,7 @@ export async function login(keypair, proxy) {
 }
 
 export async function printUserInfo(config) {
+    console.log(chalk.cyan("⏳ 正在获取所有sui地址的信息......"))
     let accountsInfo = []
     let index = 1;
     for (let account of config) {
@@ -37,25 +39,24 @@ export async function printUserInfo(config) {
         }
 
         const position = await queryPositions(keypair, account.bearerToken, account.proxy)
+        const USDCBlance = await getDepositedUsdcBalance(account.bearerToken, account.proxy)
 
         accountsInfo.push([
             index++,
             account.nickname,
             keypair.toSuiAddress(),
-            0,
-            position
+            USDCBlance,
+            position.length
         ])
     }
 
-    writeFileSync(configPath, JSON.stringify(config, null, 2));
-
     const table = new Table({
-        head: ['序号', '备注', '地址', 'USDC_TEST余额', '仓位'],
+        head: ['序号', '备注', '地址', 'USDC_TEST余额', '仓位数量'],
         style: {
             head: ['cyan'],
             border: ['gray'],
         },
-        colWidths: [8, 10, 68, 15, 100],
+        colWidths: [8, 15, 68, 15, 10],
         chars: {
             top: '─', 'top-mid': '┬', 'top-left': '┌', 'top-right': '┐',
             bottom: '─', 'bottom-mid': '┴', 'bottom-left': '└', 'bottom-right': '┘',

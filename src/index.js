@@ -6,7 +6,7 @@ import path from 'path';
 import chalk from "chalk";
 import { fileURLToPath } from "node:url";
 import { isValidToken, printAuthorInfo } from "./utils/util.js";
-import { login } from "./services/UserService.js";
+import { login, printUserInfo } from "./services/UserService.js";
 import { writeFileSync } from "node:fs";
 import { CoinType } from "./enum/CoinType.js";
 import { claimFaucet } from "./services/FaucetService.js";
@@ -33,14 +33,27 @@ const client = new SuiClient({url: 'https://fullnode.mainnet.sui.io:443'});
 printAuthorInfo()
 
 async function main() {
-    const target = parseInt(process.argv[2], 10)
-    const account = config[target]
+    await printUserInfo(config)
+    writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+    const {selectedAccountIndex} = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'selectedAccountIndex',
+            message: '请输入账户序号:',
+            validate: input => {
+                return isNaN(input) ? '必须是数字' : true;
+            }
+        }
+    ]);
+
+    const account = config[selectedAccountIndex - 1]
     const suiPrivateKey = account.suiPrivateKey;
     const {schema, secretKey} = decodeSuiPrivateKey(suiPrivateKey);
     const keypair = Ed25519Keypair.fromSecretKey(secretKey);
 
     console.log(chalk.gray('----------------------------------------'));
-    console.log(chalk.magenta(`👤 正在处理地址(${account.nickname}):`), chalk.white(keypair.toSuiAddress()));
+    console.log(chalk.magenta(`👤 正在查询地址(${account.nickname}):`), chalk.white(keypair.toSuiAddress()), chalk.magenta("的仓位信息"));
 
     if (!isValidToken(account.bearerToken)) {
         const bearerToken = await login(keypair)

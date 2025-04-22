@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { SocksProxyAgent } from "socks-proxy-agent";
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 // 公共headers
 const commonHeaders = {
