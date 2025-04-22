@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { SocksProxyAgent } from "socks-proxy-agent";
 
 // 公共headers
 const commonHeaders = {
@@ -21,7 +22,11 @@ const commonHeaders = {
   'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
 }
 
-export const requestLoginApi = async (data) => {
+export const requestLoginApi = async (data, proxy) => {
+    let httpsAgent
+    if (proxy != null && proxy !== "") {
+        httpsAgent = new SocksProxyAgent(`socks://${proxy}`)
+    }
     // 登录特有的headers
     const headers = {
         ...commonHeaders,
@@ -30,10 +35,9 @@ export const requestLoginApi = async (data) => {
 
     const response = await axios.post('https://dasprkkzjjkl7.cloudfront.net/api/auth/auth/token',
         data,
-        {headers}
+        {headers, httpsAgent}
     );
 
-    console.log(response.data)
     if (response.status === 200 && response.data.msg === 'SUCCESS') {
         return response.data.data
     }
@@ -78,7 +82,11 @@ export const getTransactionList = async (address, page = 1, limit = 10) => {
  * @param {string} address - 地址
  * @returns {Promise<Object>} - 返回nonce数据
  */
-export const generateNonce = async (address) => {
+export const generateNonce = async (address, proxy) => {
+    let httpsAgent
+    if (proxy != null && proxy !== "") {
+        httpsAgent = new SocksProxyAgent(`socks://${proxy}`)
+    }
     try {
         // nonce特有的headers
         const headers = {
@@ -89,7 +97,7 @@ export const generateNonce = async (address) => {
         const response = await axios.post(
             'https://dasprkkzjjkl7.cloudfront.net/api/auth/auth/generateNonce',
             { address },
-            { headers }
+            { headers, httpsAgent }
         );
 
         if (response.status === 200) {
@@ -102,7 +110,11 @@ export const generateNonce = async (address) => {
     }
 };
 
-export const openPosition = async (body, token) => {
+export const openPosition = async (body, token, proxy) => {
+    let httpsAgent
+    if (proxy != null && proxy !== "") {
+        httpsAgent = new SocksProxyAgent(`socks://${proxy}`)
+    }
     try {
         // 开仓特有的headers
         const headers = {
@@ -120,7 +132,7 @@ export const openPosition = async (body, token) => {
         const response = await axios.post(
             'https://dasprkkzjjkl7.cloudfront.net/api/contract-provider/contract/order/openPosition',
             body,
-            { headers }
+            { headers, httpsAgent }
         );
 
         if (response.status === 200) {
@@ -133,7 +145,12 @@ export const openPosition = async (body, token) => {
     }
 };
 
-export const closePosition = async (body, token) => {
+export const closePosition = async (body, token, proxy) => {
+    let httpsAgent
+    if (proxy != null && proxy !== "") {
+        httpsAgent = new SocksProxyAgent(`socks://${proxy}`)
+    }
+
     try {
         // 平仓特有的headers
         const headers = {
@@ -151,7 +168,7 @@ export const closePosition = async (body, token) => {
         const response = await axios.post(
             'https://dasprkkzjjkl7.cloudfront.net/api/contract-provider/contract/order/closePosition',
             body,
-            { headers }
+            { headers, httpsAgent }
         );
 
         if (response.status === 200) {
@@ -172,7 +189,11 @@ export const closePosition = async (body, token) => {
  * @param {string} token - 认证令牌
  * @returns {Promise<Object>} - 返回Position列表数据
  */
-export const getPositionList = async (body, token) => {
+export const getPositionList = async (body, token, proxy) => {
+    let httpsAgent
+    if (proxy != null && proxy !== "") {
+        httpsAgent = new SocksProxyAgent(`socks://${proxy}`)
+    }
     try {
         // 查询Position特有的headers
         const headers = {
@@ -190,7 +211,7 @@ export const getPositionList = async (body, token) => {
         const response = await axios.post(
             'https://dasprkkzjjkl7.cloudfront.net/api/contract-provider/contract/selectContractPositionList',
             body,
-            { headers }
+            { headers,httpsAgent }
         );
 
         if (response.status === 200) {
@@ -202,5 +223,40 @@ export const getPositionList = async (body, token) => {
         return null;
     }
 };
+
+export async function getDepositedUsdcBalance(bearer, proxy) {
+    let httpsAgent
+    if (proxy != null && proxy !== "") {
+        httpsAgent = new SocksProxyAgent(`socks://${proxy}`)
+    }
+    const response = await axios.post(
+        'https://dasprkkzjjkl7.cloudfront.net/api/contract-provider/contract-account/overview/4',
+        null, // POST body为空
+        {
+            headers: {
+                'accept': 'application/json, text/plain, */*',
+                'accept-language': 'en-US',
+                'authorization': `Bearer ${bearer}`,
+                'brand-exchange': 'sui',
+                'content-length': '0',
+                'dnt': '1',
+                'origin': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app',
+                'platform-exchange': 'navi',
+                'priority': 'u=1, i',
+                'referer': 'https://perp-front-git-dev-navi-fd9a1df6.vercel.app/',
+                'sec-ch-ua': '"Chromium";v="135", "Not-A.Brand";v="8"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"macOS"',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'cross-site',
+                'source-client': 'Web',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
+            },
+            httpsAgent
+        }
+    )
+    return response.data.data.availableAmount
+}
 
 

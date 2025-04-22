@@ -27,15 +27,7 @@ function generateClientOrderId(length = 21) {
     }, "");
 }
 
-export async function openBtcWithMarket(keypair, quantity, token) {
-    await openPositionWithMarket(PrepType.BTC_USD, keypair, quantity, token)
-}
-
-export async function openEthWithMarket(keypair, quantity, token) {
-    await openPositionWithMarket(PrepType.ETH_USD, keypair, quantity, token)
-}
-
-export async function openPositionWithMarket(perpInfo, keypair, quantity, token) {
+export async function openPositionWithMarket(perpInfo, keypair, quantity, isLong, token, proxy) {
     try {
         
         const clientOrderId = generateClientOrderId();
@@ -56,7 +48,7 @@ export async function openPositionWithMarket(perpInfo, keypair, quantity, token)
             clientOrderId: clientOrderId, // 客户端订单ID
             contractPairId: perpInfo.contractPairId, // 合约对ID，根据实际情况设置
             contractPositionId: 0, // 新开仓，ID为0
-            isLong: true, // 做多
+            isLong: isLong, // 做多
             isMarket: true, // 市价单
             lever: 10, // 杠杆倍数
             matchType: 1, // 匹配类型，根据实际情况设置
@@ -68,9 +60,9 @@ export async function openPositionWithMarket(perpInfo, keypair, quantity, token)
         };
 
         // 4. 调用API开仓
-        const result = await openPosition(body, token);
+        const result = await openPosition(body, token, proxy);
         if (result && result.msg === 'SUCCESS') {
-            console.log(`成功开仓${quantity}个${perpInfo.name}`);
+            console.log(`✨ 成功开仓${quantity}个${perpInfo.name}`);
         } else {
             console.error('开仓失败:', result);
         }
@@ -81,10 +73,19 @@ export async function openPositionWithMarket(perpInfo, keypair, quantity, token)
     }
 }
 
-export async function closePositionWithMarket(perpInfo, keypair, token) {
-    const positionResult = await queryPositions(keypair, token)
-    const btcPositionInfo = positionResult.filter(it => it.contractPairId === perpInfo.contractPairId)[0]
-    const quantity = btcPositionInfo.quantity
+export async function closePositionWithMarket(positionInfo, keypair, token, proxy) {
+    let perpInfo;
+    switch (positionInfo.symbol) {
+        case "ETH-USD":
+            perpInfo = PrepType.ETH_USD
+            break
+        case "BTC-USD":
+            perpInfo = PrepType.BTC_USD
+            break
+        default:
+            perpInfo = null
+    }
+    const quantity = positionInfo.quantity
     try {
         const clientOrderId = generateClientOrderId();
         const amount = quantity * perpInfo.price;
@@ -103,7 +104,7 @@ export async function closePositionWithMarket(perpInfo, keypair, token) {
             amount: amount, // 金额 = 数量 * 杠杆
             clientOrderId: clientOrderId, // 客户端订单ID
             contractPairId: perpInfo.contractPairId, // 合约对ID，根据实际情况设置
-            contractPositionId: btcPositionInfo.id, // 要平仓的仓位ID
+            contractPositionId: positionInfo.id, // 要平仓的仓位ID
             isLong: true, // 做多
             isMarket: true, // 市价单
             originMsg: originMsg,
@@ -113,9 +114,9 @@ export async function closePositionWithMarket(perpInfo, keypair, token) {
         };
 
         // 调用API平仓
-        const result = await closePosition(body, token);
+        const result = await closePosition(body, token, proxy);
         if (result && result.msg === 'SUCCESS') {
-            console.log(`成功平仓${quantity}个${perpInfo.name}, 收益为: ${btcPositionInfo.unrealizedPnl}`);
+            console.log(`✨ 成功平仓${quantity}个${perpInfo.name}, 收益为: ${positionInfo.unrealizedPnl}`);
         } else {
             console.error('平仓失败:', result);
         }
@@ -126,7 +127,7 @@ export async function closePositionWithMarket(perpInfo, keypair, token) {
     }
 }
 
-export const queryPositions = async (keypair, token, pageNo = 1, pageSize = 10) => {
+export const queryPositions = async (keypair, token, proxy, pageNo = 1, pageSize = 10) => {
     try {
 
         // 构建请求体
@@ -136,7 +137,7 @@ export const queryPositions = async (keypair, token, pageNo = 1, pageSize = 10) 
         };
 
         // 调用API获取Position列表
-        const result = await getPositionList(body, token);
+        const result = await getPositionList(body, token, proxy);
         if (result && result.msg === "SUCCESS") {
             return result.data.records
         }
@@ -147,9 +148,8 @@ export const queryPositions = async (keypair, token, pageNo = 1, pageSize = 10) 
     }
 };
 
-export const printPositionsInfo = async (keypair, token) => {
+export const printPositionsInfo =  (queryResult) => {
     let positionInfo = [];
-    const queryResult = await queryPositions(keypair, token);
     for (let i = 0; i < queryResult.length; i++) {
         const position = queryResult[i]
         positionInfo.push([

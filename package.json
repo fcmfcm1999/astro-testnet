@@ -9,10 +9,13 @@
   "private": true,
   "dependencies": {
     "@mysten/sui.js": "^0.54.1",
+    "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "cli-table3": "^0.6.5",
     "dayjs": "^1.11.13",
-    "jsonwebtoken": "^9.0.2"
+    "inquirer": "^12.5.2",
+    "jsonwebtoken": "^9.0.2",
+    "socks-proxy-agent": "^8.0.5"
   },
   "devDependencies": {
     "@types/node": "^22.14.0"
