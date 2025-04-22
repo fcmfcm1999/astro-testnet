@@ -2,11 +2,11 @@
   {
     "nickname": "sui地址的备注 可以不填.例如，sui-1",
     "suiPrivateKey": "0x...Sui私钥",
-    "proxy": "ip代理地址 仅支持socks5, 格式username:password@ip:port"
+    "proxy": "ip代理地址 仅支持socks5, 格式username:password@ip:port 可以不填, 直接留空"
   },
   {
     "nickname": "sui地址的备注 可以不填. 例如，sui-2",
     "suiPrivateKey": "0x...Sui私钥",
-    "proxy": "ip代理地址 仅支持socks5, 格式username:password@ip:port"
+    "proxy": ""
   }
 ]
