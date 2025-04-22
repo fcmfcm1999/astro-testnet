@@ -1,4 +1,4 @@
-# Momentum 交易机器人
+# ASTRO交易机器人
 
 这是一个基于 Sui 网络上[Astro](https://beta.astros.ag/perp?referralCode=AYXOT2)测试网的自动化交易机器人，支持多账户管理和一键开关仓。
 
