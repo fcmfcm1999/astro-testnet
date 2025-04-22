@@ -1,6 +1,6 @@
 # ASTRO交易机器人
 
-这是一个基于 Sui 网络上[Astro](https://beta.astros.ag/perp?referralCode=AYXOT2)测试网的自动化交易机器人，支持多账户管理和一键开关仓。
+这是一个基于 Sui 网络上[Astro](https://beta.astros.ag/perp?referralCode=AYXOT2)测试网的自动化交易机器人，支持多账户管理, 自动领水和一键开关仓。
 
 **更多脚本分享, 关注我的[X](https://x.com/0Xiaofan22921)**
 
