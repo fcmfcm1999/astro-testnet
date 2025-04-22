@@ -41,6 +41,9 @@ npm install
 ]
 ```
 
+⚠️ 该项目只有领水和存入是链上操作, 开关仓位全部是通过调用Astro的api来实现的, 最好配置上ip代理。IP代理我用的是[porxyline](https://proxyline.net?line=281182), 下单可以使用我的优惠码(GM43rStlgrOSOpV7HVC)可以打九折。  
+                                                                                                                                                                                                       
+
 在`.env` 文件中配置你的邀请码信息:
 ```
 INVITE_CODE=AYXOT2
