@@ -13,6 +13,7 @@
     "chalk": "^5.4.1",
     "cli-table3": "^0.6.5",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.5.0",
     "inquirer": "^12.5.2",
     "jsonwebtoken": "^9.0.2",
     "socks-proxy-agent": "^8.0.5"

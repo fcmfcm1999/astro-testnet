@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { SocksProxyAgent } from "socks-proxy-agent";
+require('dotenv').config();
 
 // 公共headers
 const commonHeaders = {
@@ -30,7 +31,7 @@ export const requestLoginApi = async (data, proxy) => {
     // 登录特有的headers
     const headers = {
         ...commonHeaders,
-        'invite-code': 'AYXOT2',
+        'invite-code': process.env.INVITE_CODE,
     };
 
     const response = await axios.post('https://dasprkkzjjkl7.cloudfront.net/api/auth/auth/token',
