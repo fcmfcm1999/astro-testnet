@@ -40,7 +40,7 @@ async function main() {
     const keypair = Ed25519Keypair.fromSecretKey(secretKey);
 
     console.log(chalk.gray('----------------------------------------'));
-    console.log(chalk.magenta('👤 正在处理地址:'), chalk.white(keypair.toSuiAddress()));
+    console.log(chalk.magenta(`👤 正在处理地址(${account.nickname}):`), chalk.white(keypair.toSuiAddress()));
 
     if (!isValidToken(account.bearerToken)) {
         const bearerToken = await login(keypair)
